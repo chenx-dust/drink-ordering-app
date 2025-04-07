@@ -1,24 +1,27 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
+import { DrinkProvider } from './components/DrinkContext';
+import Navbar from './components/Navbar';
+import CategoryMenu from './components/CategoryMenu';
+import DrinkList from './components/DrinkList';
+import Cart from './components/Cart';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <DrinkProvider>
+      <div className="App">
+        <Navbar />
+        <div className="main-content">
+          <div className="sidebar">
+            <CategoryMenu />
+            <Cart />
+          </div>
+          <div className="content">
+            <DrinkList />
+          </div>
+        </div>
+      </div>
+    </DrinkProvider>
   );
 }
 
