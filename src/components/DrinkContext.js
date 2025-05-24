@@ -8,6 +8,8 @@ export const DrinkProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(1);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState(null);
+  const [showCheckout, setShowCheckout] = useState(false);
   
   // Add item to cart
   const addToCart = (drink, size, selectedOptions = []) => {
@@ -65,12 +67,40 @@ export const DrinkProvider = ({ children }) => {
   const getCartTotal = () => {
     return cart.reduce((total, item) => total + (item.totalPrice * item.quantity), 0).toFixed(2);
   };
+
+  // Set delivery address
+  const updateDeliveryAddress = (address) => {
+    setDeliveryAddress(address);
+  };
+  
+  // Start checkout process
+  const startCheckout = () => {
+    if (cart.length > 0) {
+      setShowCheckout(true);
+    }
+  };
   
   // Complete the order
   const completeOrder = () => {
+    if (!deliveryAddress) {
+      alert('请选择配送地址');
+      return;
+    }
+    
     // In a real app, we would send the order to a backend server here
+    // including the delivery address information
+    const orderData = {
+      items: cart,
+      total: getCartTotal(),
+      deliveryAddress: deliveryAddress,
+      orderTime: new Date().toISOString()
+    };
+    
+    console.log('Order placed:', orderData);
+    
     setOrderComplete(true);
     clearCart();
+    setShowCheckout(false);
     
     // Reset order status after 5 seconds
     setTimeout(() => {
@@ -90,7 +120,12 @@ export const DrinkProvider = ({ children }) => {
         clearCart,
         getCartTotal,
         completeOrder,
-        orderComplete
+        orderComplete,
+        deliveryAddress,
+        updateDeliveryAddress,
+        showCheckout,
+        setShowCheckout,
+        startCheckout
       }}
     >
       {children}
