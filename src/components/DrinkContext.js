@@ -5,11 +5,14 @@ const DrinkContext = createContext();
 export const useDrinkContext = () => useContext(DrinkContext);
 
 export const DrinkProvider = ({ children }) => {
+  const [drinks, setDrinks] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [cart, setCart] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(1);
-  const [orderComplete, setOrderComplete] = useState(false);
-  const [deliveryAddress, setDeliveryAddress] = useState(null);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryLocation, setDeliveryLocation] = useState(null);
+  const [orderComplete, setOrderComplete] = useState(false);
   
   // Add item to cart
   const addToCart = (drink, size, selectedOptions = []) => {
@@ -69,8 +72,9 @@ export const DrinkProvider = ({ children }) => {
   };
 
   // Set delivery address
-  const updateDeliveryAddress = (address) => {
+  const updateDeliveryAddress = (address, location) => {
     setDeliveryAddress(address);
+    setDeliveryLocation(location);
   };
   
   // Start checkout process
@@ -111,21 +115,23 @@ export const DrinkProvider = ({ children }) => {
   return (
     <DrinkContext.Provider
       value={{
-        cart,
+        drinks,
+        categories,
         selectedCategory,
+        cart,
+        showCheckout,
+        deliveryAddress,
+        deliveryLocation,
         setSelectedCategory,
         addToCart,
-        updateCartItemQuantity,
         removeFromCart,
+        updateCartItemQuantity,
         clearCart,
         getCartTotal,
-        completeOrder,
-        orderComplete,
-        deliveryAddress,
-        updateDeliveryAddress,
-        showCheckout,
         setShowCheckout,
-        startCheckout
+        updateDeliveryAddress,
+        completeOrder,
+        orderComplete
       }}
     >
       {children}

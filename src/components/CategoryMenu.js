@@ -1,9 +1,14 @@
 import React from "react";
 import { drinks } from "../data/drinks";
 import { useDrinkContext } from "./DrinkContext";
+import { useEffect } from "react";
 
 const CategoryMenu = () => {
   const { selectedCategory, setSelectedCategory } = useDrinkContext();
+
+  useEffect(() => {
+    setSelectedCategory(drinks[0].id);
+  }, []);
 
   return (
     <div className="category-menu">

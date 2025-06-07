@@ -9,7 +9,7 @@ const Cart = () => {
     clearCart,
     getCartTotal,
     orderComplete,
-    startCheckout
+    setShowCheckout
   } = useDrinkContext();
 
   if (orderComplete) {
@@ -105,7 +105,7 @@ const Cart = () => {
           <span>¥{getCartTotal()}</span>
         </div>
 
-        <button className="checkout-btn" onClick={startCheckout}>
+        <button className="checkout-btn" onClick={() => setShowCheckout(true)}>
           提交订单
         </button>
       </div>

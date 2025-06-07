@@ -1,0 +1,50 @@
+.admin-panel {
+  padding: 2rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.admin-header h1 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.status-filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-filter label {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.status-filter select {
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  background-color: white;
+  cursor: pointer;
+}
+
+.admin-content {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+  min-height: 0;
+} 

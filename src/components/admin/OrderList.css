@@ -1,0 +1,143 @@
+.order-list {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.order-list h2 {
+  padding: 1.5rem;
+  margin: 0;
+  border-bottom: 1px solid #dee2e6;
+  color: #2c3e50;
+  font-size: 1.4rem;
+}
+
+.orders-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.order-item {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.order-item:hover {
+  border-color: #3498db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-item.selected {
+  border-color: #3498db;
+  background-color: #ebf5ff;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.order-number {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.order-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-preparing {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status-delivering {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-completed {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.order-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.order-customer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.order-customer strong {
+  color: #2c3e50;
+}
+
+.order-customer span {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.order-time {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.order-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #dee2e6;
+}
+
+.order-items-count {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.order-total {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.order-list-loading,
+.order-list-error,
+.no-orders {
+  padding: 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.order-list-error {
+  color: #dc3545;
+} 

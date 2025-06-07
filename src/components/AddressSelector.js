@@ -5,13 +5,15 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 const MAP_API_KEY = '17fda18032b25c49faae49a26cbf2e3e';
 const MAP_SECURE_KEY = '6e01241a781e1a45945f791efdf2d05e';
 
-const AddressSelector = ({ onAddressSelect }) => {
-  const [address, setAddress] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+const AddressSelector = ({ onSelect }) => {
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [mapCenter, setMapCenter] = useState({ lat: 39.9042, lng: 116.4074 }); // 默认北京中心
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
   const [mapInstance, setMapInstance] = useState(null);
   const [marker, setMarker] = useState(null);
-  const [selectedPoi, setSelectedPoi] = useState(null);
   const [placeSearch, setPlaceSearch] = useState(null);
   const [coordinates, setCoordinates] = useState(null);
   const mapContainer = useRef(null);
@@ -115,7 +117,7 @@ const AddressSelector = ({ onAddressSelect }) => {
         const addressComponent = result.regeocode.addressComponent;
         const address = result.regeocode.formattedAddress;
         
-        setSelectedPoi({
+        setSelectedAddress({
           name: address,
           address: address,
           location: lnglat,
@@ -124,7 +126,10 @@ const AddressSelector = ({ onAddressSelect }) => {
           province: addressComponent.province
         });
         
-        setAddress(address);
+        setAddresses([{
+          text: address,
+          location: lnglat
+        }]);
       }
     });
   };
@@ -136,7 +141,10 @@ const AddressSelector = ({ onAddressSelect }) => {
       return;
     }
     
-    setAddress(keyword);
+    setAddresses([{
+      text: keyword,
+      location: null
+    }]);
     
     console.log('searchPlaces', keyword);
     console.log('placeSearch', placeSearch);
@@ -156,8 +164,11 @@ const AddressSelector = ({ onAddressSelect }) => {
   
   // 从搜索结果中选择地点
   const handleSelectPlace = (poi) => {
-    setSelectedPoi(poi);
-    setAddress(poi.name);
+    setSelectedAddress(poi);
+    setAddresses([{
+      text: poi.name,
+      location: poi.location
+    }]);
     setSearchResults([]);
     
     if (mapInstance && marker) {
@@ -168,27 +179,13 @@ const AddressSelector = ({ onAddressSelect }) => {
     }
     
     // 通知父组件所选地址
-    onAddressSelect({
-      address: poi.name,
-      fullAddress: `${poi.province || ''}${poi.city || ''}${poi.district || ''}${poi.address || ''}${poi.name}`,
-      location: coordinates ? {
-        lng: parseFloat(coordinates.lng),
-        lat: parseFloat(coordinates.lat)
-      } : poi.location
-    });
+    onSelect(poi.name, poi.location || selectedLocation || mapCenter);
   };
   
   // 确认所选地址
   const confirmAddress = () => {
-    if (selectedPoi) {
-      onAddressSelect({
-        address: selectedPoi.name,
-        fullAddress: selectedPoi.address,
-        location: coordinates ? {
-          lng: parseFloat(coordinates.lng),
-          lat: parseFloat(coordinates.lat)
-        } : selectedPoi.location
-      });
+    if (selectedAddress) {
+      onSelect(selectedAddress.name, selectedAddress.location || selectedLocation || mapCenter);
       setShowMap(false);
     }
   };
@@ -197,16 +194,31 @@ const AddressSelector = ({ onAddressSelect }) => {
   const handleInputChange = (e) => {
     console.log('handleInputChange', e.target.value);
     const value = e.target.value;
-    setAddress(value);
+    setAddresses([{
+      text: value,
+      location: null
+    }]);
     searchPlaces(value);
   };
   
   // 清空当前搜索
   const clearSearch = () => {
-    setAddress('');
+    setAddresses([]);
     setSearchResults([]);
   };
-  
+
+  const handleMapClick = (e) => {
+    const location = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng()
+    };
+    setSelectedLocation(location);
+    // 如果已经选择了地址，更新它的位置
+    if (selectedAddress) {
+      onSelect(selectedAddress.name, location);
+    }
+  };
+
   return (
     <div className="address-selector">
       <div className="address-input-container">
@@ -214,11 +226,12 @@ const AddressSelector = ({ onAddressSelect }) => {
           type="text"
           className="address-input"
           placeholder="输入配送地址"
-          value={address}
+          value={addresses.map(a => a.text).join(', ')}
           onChange={handleInputChange}
           onClick={() => setShowMap(true)}
+          required
         />
-        {address && (
+        {addresses.length > 0 && (
           <button className="clear-input-btn" onClick={clearSearch}>×</button>
         )}
       </div>
@@ -236,7 +249,7 @@ const AddressSelector = ({ onAddressSelect }) => {
                 type="text"
                 className="map-search-input"
                 placeholder="搜索地址、小区、写字楼、学校等"
-                value={address}
+                value={addresses.map(a => a.text).join(', ')}
                 onChange={handleInputChange}
               />
             </div>
@@ -256,14 +269,14 @@ const AddressSelector = ({ onAddressSelect }) => {
               </div>
             )}
             
-            <div className="map-container" ref={mapContainer}></div>
+            <div className="map-container" ref={mapContainer} onClick={handleMapClick}></div>
             <div id="panel" ref={resultsPanel} className="results-panel"></div>
             
             <div className="map-footer">
               <div className="selected-location">
-                {selectedPoi && (
+                {selectedAddress && (
                   <div className="selected-address-preview">
-                    <div className="selected-address-text">{selectedPoi.name}</div>
+                    <div className="selected-address-text">{selectedAddress.name}</div>
                     {coordinates && (
                       <div className="coordinates-display">
                         经度: {coordinates.lng}, 纬度: {coordinates.lat}
@@ -275,7 +288,7 @@ const AddressSelector = ({ onAddressSelect }) => {
               <button 
                 className="confirm-address-btn"
                 onClick={confirmAddress}
-                disabled={!selectedPoi}
+                disabled={!selectedAddress}
               >
                 确认地址
               </button>

@@ -1,0 +1,212 @@
+.order-confirmation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.confirmation-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.confirmation-card h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Loading animation */
+.confirmation-card h2:only-child {
+  position: relative;
+  color: #666;
+}
+
+.confirmation-card h2:only-child::after {
+  content: "...";
+  position: absolute;
+  width: 24px;
+  text-align: left;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { content: "."; }
+  33% { content: ".."; }
+  66% { content: "..."; }
+}
+
+.order-info {
+  margin: 30px 0;
+  text-align: left;
+}
+
+.order-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.order-header h3 {
+  font-size: 24px;
+  color: #4CAF50;
+  margin: 10px 0;
+}
+
+.order-date {
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.order-items {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.order-items h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1em;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.item-name {
+  flex: 1;
+}
+
+.item-quantity {
+  color: #666;
+  margin: 0 15px;
+}
+
+.item-price {
+  font-weight: 500;
+  min-width: 80px;
+  text-align: right;
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid #ddd;
+  font-size: 1.2em;
+}
+
+.success-message {
+  color: #4CAF50;
+  margin: 20px 0;
+}
+
+.back-home-btn {
+  display: inline-block;
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.back-home-btn:hover {
+  background-color: #45a049;
+  color: white;
+  text-decoration: none;
+}
+
+.order-status {
+  margin-top: 15px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+  font-size: 1.1em;
+}
+
+.status-queuing {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.status-making {
+  background-color: #cce5ff;
+  color: #004085;
+  border: 1px solid #b8daff;
+}
+
+.status-delivering {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-delivered {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* 状态更新动画 */
+@keyframes statusUpdate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.order-status.updating {
+  animation: statusUpdate 0.5s ease;
+}
+
+/* 自动刷新指示器 */
+.refresh-indicator {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.8em;
+  color: #666;
+  opacity: 0.7;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.refresh-indicator::before {
+  content: "⟳";
+  display: inline-block;
+  margin-right: 4px;
+  animation: spin 1s linear infinite;
+}
