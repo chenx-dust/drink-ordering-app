@@ -1,3 +1,9 @@
+/**
+ * HTTP请求处理器模块
+ * 处理所有与订单相关的HTTP请求
+ * 包括创建订单、查询订单、更新订单状态等功能
+ */
+
 use actix_web::{web, HttpResponse, Result};
 use uuid::Uuid;
 use crate::db::{self, AppState};
@@ -6,6 +12,14 @@ use std::sync::mpsc::Sender;
 use std::sync::Mutex;
 use std::str::FromStr;
 
+/**
+ * 创建新订单的处理器
+ * 
+ * @param order_req - 订单创建请求
+ * @param app_state - 应用状态（包含数据库连接）
+ * @param order_sender - 订单发送器（用于串口通信）
+ * @return Result<HttpResponse> - 包含订单创建结果的HTTP响应
+ */
 pub async fn create_order(
     order_req: web::Json<CreateOrderRequest>,
     app_state: web::Data<AppState>,
@@ -59,6 +73,14 @@ pub async fn create_order(
     }
 }
 
+/**
+ * 获取订单列表的处理器
+ * 支持按状态筛选订单
+ * 
+ * @param app_state - 应用状态（包含数据库连接）
+ * @param query - 查询参数（可选的状态过滤）
+ * @return Result<HttpResponse> - 包含订单列表的HTTP响应
+ */
 pub async fn get_orders(
     app_state: web::Data<AppState>,
     query: web::Query<OrderQuery>,
@@ -79,6 +101,13 @@ pub async fn get_orders(
     }
 }
 
+/**
+ * 获取单个订单详情的处理器
+ * 
+ * @param app_state - 应用状态（包含数据库连接）
+ * @param order_number - 订单编号
+ * @return Result<HttpResponse> - 包含订单详情的HTTP响应
+ */
 pub async fn get_order(
     app_state: web::Data<AppState>,
     order_number: web::Path<String>,
@@ -97,6 +126,14 @@ pub async fn get_order(
     }
 }
 
+/**
+ * 更新订单状态的处理器
+ * 
+ * @param app_state - 应用状态（包含数据库连接）
+ * @param order_id - 订单ID
+ * @param status_update - 新的订单状态
+ * @return Result<HttpResponse> - 包含更新结果的HTTP响应
+ */
 pub async fn update_order_status(
     app_state: web::Data<AppState>,
     order_id: web::Path<i64>,

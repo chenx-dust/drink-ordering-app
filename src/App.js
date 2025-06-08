@@ -1,3 +1,8 @@
+/**
+ * 饮品订购应用的主入口文件
+ * 负责应用的整体路由结构和布局管理
+ */
+
 import React from 'react';
 import './App.css';
 import { DrinkProvider, useDrinkContext } from './components/DrinkContext';
@@ -10,6 +15,11 @@ import Checkout from './components/Checkout';
 import OrderConfirmation from './components/OrderConfirmation';
 import NotFound from './components/NotFound';
 
+/**
+ * MainContent组件 - 应用的主要内容区域
+ * 包含导航栏、侧边栏（分类菜单和购物车）以及饮品列表
+ * 当showCheckout为true时显示结账界面
+ */
 function MainContent() {
   const { showCheckout } = useDrinkContext();
 
@@ -18,25 +28,32 @@ function MainContent() {
       <Navbar />
       <div className="main-content">
         <div className="sidebar">
-          <CategoryMenu />
-          <Cart />
+          <CategoryMenu /> {/* 饮品分类菜单 */}
+          <Cart /> {/* 购物车组件 */}
         </div>
-        <DrinkList />
+        <DrinkList /> {/* 饮品列表展示区域 */}
       </div>
-      {showCheckout && <Checkout />}
+      {showCheckout && <Checkout />} {/* 条件渲染结账界面 */}
     </>
   );
 }
 
+/**
+ * App组件 - 应用的根组件
+ * 设置路由系统和全局状态管理
+ * 包含三个主要路由：
+ * 1. 主页面 ('/')
+ * 2. 订单确认页 ('/order/:orderNumber')
+ * 3. 404页面 ('*')
+ */
 function App() {
   return (
     <Router>
-      <DrinkProvider>
+      <DrinkProvider> {/* 全局饮品状态管理提供者 */}
         <div className="App">
           <Routes>
             <Route path="/order/:orderNumber" element={<OrderConfirmation />} />
             <Route path="/" element={<MainContent />} />
-            {/* 捕获所有未匹配的路由 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
