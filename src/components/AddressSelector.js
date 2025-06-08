@@ -6,10 +6,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import AMapLoader from '@amap/amap-jsapi-loader';
+import './AddressSelector.css';
 
 // 高德地图配置
-const MAP_API_KEY = '17fda18032b25c49faae49a26cbf2e3e';
-const MAP_SECURE_KEY = '6e01241a781e1a45945f791efdf2d05e';
+const MAP_API_KEY = process.env.REACT_APP_AMAP_API_KEY;
+const MAP_SECURE_KEY = process.env.REACT_APP_AMAP_SECURE_KEY;
+
+// 如果没有配置环境变量，显示错误信息
+if (!MAP_API_KEY || !MAP_SECURE_KEY) {
+  console.error('请在.env文件中配置高德地图API密钥：REACT_APP_AMAP_API_KEY和REACT_APP_AMAP_SECURE_KEY');
+}
 
 /**
  * AddressSelector组件
