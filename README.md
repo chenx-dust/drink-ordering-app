@@ -112,6 +112,40 @@ drink-ordering-app/
 - 使用 `cargo run` 启动后端服务器
 - 使用 `cargo test` 运行测试
 
+## 环境变量配置
+
+项目使用以下环境变量进行配置：
+
+### 后端环境变量
+
+```plaintext
+# 服务器监听地址和端口
+LISTEN_ADDR=127.0.0.1:3001
+
+# 串口配置（用于与外部设备通信）
+SERIAL_PORT=COM3  # Windows 示例
+# SERIAL_PORT=/dev/ttyUSB0  # Linux 示例
+# SERIAL_PORT=/dev/tty.usbserial-*  # macOS 示例
+
+# 日志级别配置
+RUST_LOG=info  # 可选值: debug, info, warn, error
+```
+
+### 配置方法
+
+1. 开发环境
+   - 创建 `.env` 文件在项目根目录
+   - 复制上述环境变量并根据需要修改值
+
+2. 生产环境
+   - 直接在系统中设置环境变量
+   - 或在容器编排文件中配置
+
+注意：
+- 如果未设置 `LISTEN_ADDR`，默认使用 `127.0.0.1:3001`
+- 如果未设置 `SERIAL_PORT`，系统将尝试自动检测可用串口
+- 建议在生产环境明确配置所有环境变量
+
 ## 部署
 
 1. 构建前端

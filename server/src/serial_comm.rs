@@ -73,6 +73,7 @@ impl SerialComm {
                             if let Ok(message) = String::from_utf8(serial_buf[..bytes_read].to_vec()) {
                                 if let Ok(serial_msg) = serde_json::from_str::<SerialMessage>(&message) {
                                     if serial_msg.message_type == "status_update" {
+                                        log::info!("Received status update for order {}", serial_msg.order_number);
                                         if let (Some(status_str), Some(callback)) = (serial_msg.status, callback.lock().ok()) {
                                             if let Ok(status) = OrderStatus::from_str(&status_str) {
                                                 callback(serial_msg.order_number, status);
@@ -84,7 +85,9 @@ impl SerialComm {
                         }
                     }
                     Err(e) => {
-                        error!("Error reading from serial port: {}", e);
+                        if e.kind() != std::io::ErrorKind::TimedOut {
+                            error!("Error reading from serial port: {}", e);
+                        }
                         thread::sleep(Duration::from_secs(1));
                     }
                 }
