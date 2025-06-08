@@ -5,6 +5,7 @@ const OrderList = ({ filterStatus, onOrderSelect, selectedOrderId, refreshTrigge
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -30,7 +31,13 @@ const OrderList = ({ filterStatus, onOrderSelect, selectedOrderId, refreshTrigge
       setError('获取订单列表时出错');
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchOrders();
   };
 
   const formatDate = (dateString) => {
@@ -76,7 +83,16 @@ const OrderList = ({ filterStatus, onOrderSelect, selectedOrderId, refreshTrigge
 
   return (
     <div className="order-list">
-      <h2>订单列表</h2>
+      <div className="order-list-header">
+        <h2>订单列表</h2>
+        <button 
+          className={`refresh-button ${isRefreshing ? 'refreshing' : ''}`}
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+        >
+          {isRefreshing ? '刷新中...' : '刷新'}
+        </button>
+      </div>
       {orders.length === 0 ? (
         <div className="no-orders">暂无订单</div>
       ) : (

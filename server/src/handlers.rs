@@ -1,94 +1,126 @@
 use actix_web::{web, HttpResponse, Result};
 use uuid::Uuid;
-
-use crate::db::AppState;
-use crate::models::{CreateOrderRequest, CreateOrderResponse, OrderList, OrderStatus, UpdateOrderStatusRequest, UpdateOrderStatusResponse, OrderQuery};
+use crate::db::{self, AppState};
+use crate::models::{CreateOrderRequest, CreateOrderResponse, OrderList, OrderStatus, UpdateOrderStatusRequest, UpdateOrderStatusResponse, OrderQuery, Order};
+use std::sync::mpsc::Sender;
+use std::sync::Mutex;
+use std::str::FromStr;
 
 pub async fn create_order(
-    data: web::Data<AppState>,
     order_req: web::Json<CreateOrderRequest>,
+    app_state: web::Data<AppState>,
+    order_sender: web::Data<Option<Mutex<Sender<Order>>>>,
 ) -> Result<HttpResponse> {
+    let order_req = order_req.into_inner();
     let order_number = Uuid::new_v4().to_string();
-    let mut db = data.db.lock().unwrap();
-    let tx = db.transaction().unwrap();
 
-    match crate::db::create_order_with_items(
-        &tx,
-        &order_number,
-        &order_req.customer_name,
-        &order_req.phone_number,
-        &order_req.delivery_address,
-        order_req.location.lat,
-        order_req.location.lng,
-        order_req.notes.as_deref(),
-        order_req.total_amount,
-        &order_req.items,
-    ) {
-        Ok(_) => {
-            tx.commit().unwrap();
-            Ok(HttpResponse::Ok().json(CreateOrderResponse {
-                success: true,
-                order_number,
-            }))
+    // 转换 CreateOrderRequest 到 Order
+    let order = Order {
+        id: 0, // 数据库会自动生成
+        order_number,
+        customer_name: order_req.customer_name,
+        phone_number: order_req.phone_number,
+        delivery_address: order_req.delivery_address,
+        latitude: order_req.location.lat,
+        longitude: order_req.location.lng,
+        notes: order_req.notes,
+        created_at: chrono::Local::now().naive_local().to_string(),
+        total_amount: order_req.total_amount,
+        status: OrderStatus::Pending,
+        items: order_req.items.into_iter().map(|item| item.into()).collect(),
+    };
+
+    if let Ok(mut conn) = app_state.db.lock() {
+        match db::create_order(&mut *conn, &order) {
+            Ok(created_order) => {
+                if let Some(sender) = order_sender.as_ref().as_ref().and_then(|a| a.lock().ok()) {
+                    if let Err(e) = sender.send(created_order.clone()) {
+                        log::error!("Failed to send order through serial port: {}", e);
+                    }
+                }
+                Ok(HttpResponse::Ok().json(CreateOrderResponse {
+                    success: true,
+                    order_number: created_order.order_number,
+                }))
+            }
+            Err(e) => {
+                log::error!("Failed to create order: {}", e);
+                Ok(HttpResponse::InternalServerError().json(CreateOrderResponse {
+                    success: false,
+                    order_number: String::new(),
+                }))
+            }
         }
-        Err(e) => {
-            tx.rollback().unwrap();
-            Ok(HttpResponse::InternalServerError().json(format!("Failed to create order: {}", e)))
-        }
+    } else {
+        Ok(HttpResponse::InternalServerError().json(CreateOrderResponse {
+            success: false,
+            order_number: String::new(),
+        }))
     }
 }
 
 pub async fn get_orders(
-    data: web::Data<AppState>,
+    app_state: web::Data<AppState>,
     query: web::Query<OrderQuery>,
 ) -> Result<HttpResponse> {
-    let db = data.db.lock().unwrap();
-    let status_filter = query.status.as_ref().and_then(|s| OrderStatus::from_str(s));
-
-    match crate::db::get_orders(&db, status_filter.as_ref().map(|s| s.as_str())) {
-        Ok(orders) => Ok(HttpResponse::Ok().json(OrderList { orders })),
-        Err(e) => Ok(HttpResponse::InternalServerError().json(format!(
-            "Failed to get orders: {}",
-            e
-        ))),
+    if let Ok(db) = app_state.db.lock() {
+        let status_filter = query.status.as_ref().and_then(|s| OrderStatus::from_str(s).ok());
+        let status_str = status_filter.as_ref().map(|s| s.to_string());
+        
+        match db::get_orders(&db, status_str.as_deref()) {
+            Ok(orders) => Ok(HttpResponse::Ok().json(OrderList { orders })),
+            Err(e) => {
+                log::error!("Failed to get orders: {}", e);
+                Ok(HttpResponse::InternalServerError().finish())
+            }
+        }
+    } else {
+        Ok(HttpResponse::InternalServerError().finish())
     }
 }
 
 pub async fn get_order(
-    data: web::Data<AppState>,
+    app_state: web::Data<AppState>,
     order_number: web::Path<String>,
 ) -> Result<HttpResponse> {
-    let db = data.db.lock().unwrap();
-
-    match crate::db::get_order_by_number(&db, &order_number.into_inner()) {
-        Ok(Some(order)) => Ok(HttpResponse::Ok().json(order)),
-        Ok(None) => Ok(HttpResponse::NotFound().json("Order not found")),
-        Err(e) => Ok(HttpResponse::InternalServerError().json(format!(
-            "Failed to get order: {}",
-            e
-        ))),
+    if let Ok(db) = app_state.db.lock() {
+        match db::get_order_by_number(&db, &order_number) {
+            Ok(Some(order)) => Ok(HttpResponse::Ok().json(order)),
+            Ok(None) => Ok(HttpResponse::NotFound().finish()),
+            Err(e) => {
+                log::error!("Failed to get order: {}", e);
+                Ok(HttpResponse::InternalServerError().finish())
+            }
+        }
+    } else {
+        Ok(HttpResponse::InternalServerError().finish())
     }
 }
 
 pub async fn update_order_status(
-    data: web::Data<AppState>,
+    app_state: web::Data<AppState>,
     order_id: web::Path<i64>,
     status_update: web::Json<UpdateOrderStatusRequest>,
 ) -> Result<HttpResponse> {
-    let db = data.db.lock().unwrap();
-
-    match crate::db::update_order_status(&db, order_id.into_inner(), status_update.status.as_str()) {
-        Ok(true) => Ok(HttpResponse::Ok().json(UpdateOrderStatusResponse {
-            success: true,
-            message: Some("Order status updated successfully".to_string()),
-        })),
-        Ok(false) => Ok(HttpResponse::NotFound().json(UpdateOrderStatusResponse {
-            success: false,
-            message: Some("Order not found".to_string()),
-        })),
-        Err(e) => Ok(HttpResponse::InternalServerError().json(UpdateOrderStatusResponse {
-            success: false,
-            message: Some(format!("Failed to update order status: {}", e)),
-        })),
+    if let Ok(db) = app_state.db.lock() {
+        match db::update_order_status(&db, order_id.into_inner(), &status_update.status.to_string()) {
+            Ok(true) => Ok(HttpResponse::Ok().json(UpdateOrderStatusResponse {
+                success: true,
+                message: None,
+            })),
+            Ok(false) => Ok(HttpResponse::NotFound().json(UpdateOrderStatusResponse {
+                success: false,
+                message: Some("Order not found".to_string()),
+            })),
+            Err(e) => {
+                log::error!("Failed to update order status: {}", e);
+                Ok(HttpResponse::InternalServerError().json(UpdateOrderStatusResponse {
+                    success: false,
+                    message: Some(format!("Failed to update order status: {}", e)),
+                }))
+            }
+        }
+    } else {
+        Ok(HttpResponse::InternalServerError().finish())
     }
 } 

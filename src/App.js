@@ -34,11 +34,6 @@ function App() {
       <DrinkProvider>
         <div className="App">
           <Routes>
-            {/* 重定向 /order-confirmation 到 /order */}
-            <Route 
-              path="/order-confirmation" 
-              element={<Navigate to="/" replace />} 
-            />
             <Route path="/order/:orderNumber" element={<OrderConfirmation />} />
             <Route path="/" element={<MainContent />} />
             {/* 捕获所有未匹配的路由 */}

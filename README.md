@@ -1,70 +1,132 @@
-# Getting Started with Create React App
+# 饮品订购系统 (Drink Ordering App)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+一个现代化的饮品在线订购系统，前端使用 React，后端使用 Rust 构建。
 
-## Available Scripts
+## 功能特点
 
-In the project directory, you can run:
+- 🍹 饮品浏览和分类展示
+- 🛒 购物车管理
+- 💳 在线下单和支付
+- 📍 高德地图定位配送
+- 🔄 实时订单状态跟踪
+- 👨‍💼 管理员后台订单管理
+- 📦 串口交互能力
 
-### `npm start`
+## 技术栈
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 前端
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- React 18
+- React Router v6 (路由管理)
+- Context API (状态管理)
+- 高德地图 JavaScript API
 
-### `npm test`
+### 后端
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Rust
+- SQLite 数据库
 
-### `npm run build`
+## 快速开始
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 环境要求
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Node.js >= 14
+- Rust >= 1.70
+- npm 或 yarn
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 安装步骤
 
-### `npm run eject`
+1. 克隆项目
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    ```bash
+    git clone [项目地址]
+    cd drink-ordering-app
+    ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. 安装前端依赖
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+    ```bash
+    npm install
+    ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. 安装后端依赖
 
-## Learn More
+    ```bash
+    cd server
+    cargo build
+    ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+4. 启动开发服务器
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    ```bash
+    # 在项目根目录下
+    npm run dev
+    ```
 
-### Code Splitting
+这将同时启动：
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- 前端开发服务器 (http://localhost:3000)
+- 后端 API 服务器 (http://localhost:3001)
 
-### Analyzing the Bundle Size
+## 项目结构
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```plaintext
+drink-ordering-app/
+├── src/                    # 前端源代码
+│   ├── components/         # React 组件
+│   ├── admin/             # 管理后台
+│   └── data/              # 静态数据
+├── server/                 # Rust 后端
+│   └── src/               # 后端源代码
+├── public/                # 静态资源
+└── package.json           # 项目配置
+```
 
-### Making a Progressive Web App
+## 主要功能模块
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+1. 用户界面
+   - 饮品分类浏览
+   - 购物车管理
+   - 订单确认和支付
+   - 配送地址选择
 
-### Advanced Configuration
+2. 订单管理
+   - 订单状态跟踪
+   - 历史订单查询
+   - 订单详情查看
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+3. 管理后台
+   - 订单处理
+   - 菜单管理
+   - 数据统计
 
-### Deployment
+## 开发指南
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 前端开发
 
-### `npm run build` fails to minify
+- 使用 `npm start` 启动前端开发服务器
+- 使用 `npm run build` 构建生产版本
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 后端开发
+
+- 使用 `cargo run` 启动后端服务器
+- 使用 `cargo test` 运行测试
+
+## 部署
+
+1. 构建前端
+
+```bash
+npm run build
+```
+
+2. 构建后端
+
+```bash
+cd server
+cargo build --release
+```
+
+## 许可证
+
+[MIT License](LICENSE)
