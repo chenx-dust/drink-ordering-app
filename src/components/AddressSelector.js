@@ -6,7 +6,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import AMapLoader from '@amap/amap-jsapi-loader';
-import './AddressSelector.css';
 
 // 高德地图配置
 const MAP_API_KEY = process.env.REACT_APP_AMAP_API_KEY;
